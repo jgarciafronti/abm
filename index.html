@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Simulación de Modelos Basados en Agentes</title>
+    <link rel="icon" href="https://via.placeholder.com/32/0056b3/ffffff?text=L" type="image/png"> <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styling */
+        :root {
+            --primary-color: #0056b3; /* A nice blue for links, buttons */
+            --secondary-color: #6c757d; /* For secondary text/elements */
+            --accent-color: #28a745; /* For highlights or success messages */
+            --dark-color: #343a40; /* For headings, main text */
+            --light-color: #f8f9fa; /* For light backgrounds */
+            --white-color: #ffffff;
+            --border-radius: 8px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif; /* Example Google Font */
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--white-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+            overflow: hidden; /* Clear floats */
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif; /* Example Google Font */
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 3em; }
+        h2 { font-size: 2.5em; text-align: center; margin-bottom: 40px;}
+        h3 { font-size: 1.8em; }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            color: #004085; /* Darker shade of primary color */
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: var(--white-color);
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            transition: background var(--transition-speed) ease;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #004085;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Header & Hero Section */
+        .hero {
+            background: url('https://via.placeholder.com/1920x800/0056b3/ffffff?text=Fondo+Hero+%28Simulaci%C3%B3n%29') no-repeat center center/cover;
+            color: var(--white-color);
+            height: 70vh; /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Overlay for readability */
+        }
+
+        .hero-content {
+            z-index: 1; /* Ensure content is above overlay */
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 4em;
+            margin-bottom: 10px;
+            color: var(--white-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-content p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: var(--light-color);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--dark-color);
+            color: var(--white-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--white-color);
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+        }
+
+        .navbar ul li {
+            margin-left: 30px;
+        }
+
+        .navbar ul li a {
+            color: var(--white-color);
+            font-weight: bold;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .navbar ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width var(--transition-speed) ease;
+        }
+
+        .navbar ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Sections */
+        .section {
+            padding: 80px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section.bg-light {
+            background-color: var(--light-color);
+        }
+
+        .section-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .section-content .section-image {
+            max-width: 50%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .section-content .section-image.right {
+            order: 2; /* Puts image on the right */
+        }
+
+        /* Grid Layouts */
+        .grid-2-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .grid-3-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        /* Research Items */
+        .research-item {
+            background: var(--white-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .research-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .research-item img {
+            max-width: 80px;
+            margin-bottom: 15px;
+        }
+
+        /* Team Members */
+        .team-member {
+            text-align: center;
+            background: var(--white-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .team-member img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .team-member h3 {
+            margin-bottom: 5px;
+            font-size: 1.5em;
+        }
+
+        .team-member p {
+            color: var(--secondary-color);
+            font-size: 0.95em;
+        }
+
+        .team-member .small-text {
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* Publications */
+        .publication-list {
+            margin-top: 40px;
+        }
+
+        .publication-item {
+            background: var(--white-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .publication-item h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .publication-item p {
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .publication-item .read-more {
+            align-self: flex-end; /* Pushes button to the right */
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            background-color: var(--accent-color);
+            color: var(--white-color);
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .publication-item .read-more:hover {
+            background-color: #218838;
+        }
+
+        .text-center {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 600px;
+            margin: 40px auto 0;
+            padding: 30px;
+            background: var(--white-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1em;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+        }
+
+        .contact-form button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: var(--white-color);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer .social-links {
+            margin-top: 20px;
+        }
+
+        .footer .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .footer .social-links img {
+            width: 30px;
+            height: 30px;
+            filter: invert(100%); /* Makes icons white */
+            transition: filter var(--transition-speed) ease;
+        }
+
+        .footer .social-links img:hover {
+            filter: invert(50%) sepia(100%) saturate(2000%) hue-rotate(180deg); /* Example hover effect for icons */
+        }
+
+        /* Responsive Design (Basic Media Queries) */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 3em;
+            }
+
+            .hero-content p {
+                font-size: 1.2em;
+            }
+
+            .navbar .container {
+                flex-direction: column;
+            }
+
+            .navbar ul {
+                margin-top: 15px;
+                flex-wrap: wrap; /* Allows menu items to wrap */
+                justify-content: center;
+            }
+
+            .navbar ul li {
+                margin: 5px 15px; /* Adjust spacing for smaller screens */
+            }
+
+            .section-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .section-content .section-image {
+                max-width: 80%; /* Adjust image size for mobile */
+                order: initial; /* Reset order for smaller screens */
+            }
+
+            .grid-2-cols, .grid-3-cols {
+                grid-template-columns: 1fr; /* Stack columns on small screens */
+            }
+
+            .team-member img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2.5em;
+            }
+
+            .hero-content p {
+                font-size: 1em;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Laboratorio de Simulación de Modelos Basados en Agentes</h1>
+            <p>Explorando la complejidad a través de la simulación computacional.</p>
+            <a href="#about" class="btn">Conoce más</a>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">LS-MBA</a>
+            <ul>
+                <li><a href="#about">Acerca de</a></li>
+                <li><a href="#research">Investigación</a></li>
+                <li><a href="#team">Equipo</a></li>
+                <li><a href="#publications">Publicaciones</a></li>
+                <li><a href="#contact">Contacto</a></li>
+                <li><a href="https://www.google.com" target="_blank">Recursos Útiles</a></li>
+                <li><a href="https://www.bing.com" target="_blank">Nuestros Proyectos</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="about" class="section">
+            <div class="container">
+                <h2>Acerca de Nuestro Laboratorio</h2>
+                <div class="section-content">
+                    <img src="https://via.placeholder.com/600x400/87CEEB/333333?text=Simulacion+de+Agentes" alt="Representación de un modelo de simulación de agentes" class="section-image right">
+                    <div>
+                        <p>En el Laboratorio de Simulación de Modelos Basados en Agentes (**LS-MBA**), nos dedicamos a la investigación, desarrollo y aplicación de **modelos computacionales** que simulan el comportamiento y la interacción de agentes autónomos. Estos modelos nos permiten explorar fenómenos complejos en diversas áreas como la economía, la sociología, la biología y la ingeniería.</p>
+                        <p>Nuestra misión es proporcionar herramientas y conocimientos para entender sistemas dinámicos, predecir tendencias y diseñar intervenciones efectivas, contribuyendo así al avance científico y tecnológico.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="research" class="section bg-light">
+            <div class="container">
+                <h2>Líneas de Investigación</h2>
+                <div class="grid-2-cols">
+                    <div class="research-item">
+                        <img src="https://via.placeholder.com/80x80/0056b3/ffffff?text=Econ" alt="Icono de investigación económica">
+                        <h3>Modelos Económicos y Financieros</h3>
+                        <p>Simulación de mercados, comportamiento del consumidor, burbujas financieras y políticas monetarias.</p>
+                    </div>
+                    <div class="research-item">
+                        <img src="https://via.placeholder.com/80x80/0056b3/ffffff?text=Soci" alt="Icono de investigación social">
+                        <h3>Dinámicas Sociales y Urbanas</h3>
+                        <p>Estudio de la difusión de innovaciones, segregación espacial, patrones de movilidad y fenómenos colectivos.</p>
+                    </div>
+                    <div class="research-item">
+                        <img src="https://via.placeholder.com/80x80/0056b3/ffffff?text=Biol" alt="Icono de investigación biológica">
+                        <h3>Sistemas Biológicos y Ecológicos</h3>
+                        <p>Modelado de poblaciones, propagación de enfermedades, ecosistemas complejos y comportamiento animal.</p>
+                    </div>
+                    <div class="research-item">
+                        <img src="https://via.placeholder.com/80x80/0056b3/ffffff?text=AI" alt="Icono de investigación IA">
+                        <h3>Inteligencia Artificial y Optimización</h3>
+                        <p>Desarrollo de algoritmos de optimización basados en agentes y sistemas multi-agente inteligentes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="section">
+            <div class="container">
+                <h2>Nuestro Equipo</h2>
+                <div class="grid-3-cols">
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/150x150/f0f0f0/333333?text=Juan+P." alt="Foto de Dr. Juan Pérez">
+                        <h3>Dr. Juan Pérez</h3>
+                        <p>Director del Laboratorio</p>
+                        <p class="small-text">Experto en modelos económicos basados en agentes.</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/150x150/f0f0f0/333333?text=Ana+G." alt="Foto de Dra. Ana García">
+                        <h3>Dra. Ana García</h3>
+                        <p>Investigadora Principal</p>
+                        <p class="small-text">Especialista en simulación de sistemas sociales.</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/150x150/f0f0f0/333333?text=Carlos+R." alt="Foto de MSc. Carlos Ruiz">
+                        <h3>MSc. Carlos Ruiz</h3>
+                        <p>Desarrollador de Modelos</p>
+                        <p class="small-text">Enfocado en la implementación computacional.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="publications" class="section bg-light">
+            <div class="container">
+                <h2>Publicaciones Recientes</h2>
+                <div class="publication-list">
+                    <article class="publication-item">
+                        <h3>Impacto de Políticas Monetarias en Mercados Financieros usando ABM</h3>
+                        <p>Autor(es): J. Pérez, A. López, M. Sánchez</p>
+                        <p>Revista: Journal of Economic Simulation, Vol. 15, No. 2, pp. 123-145, 2024.</p>
+                        <a href="https://www.google.com/search?q=Journal+of+Economic+Simulation" target="_blank" class="read-more">Ver Publicación</a>
+                    </article>
+                    <article class="publication-item">
+                        <h3>Dinámicas de Segregación Urbana: Un Enfoque Basado en Agentes</h3>
+                        <p>Autor(es): A. García, L. Torres</p>
+                        <p>Conferencia: International Conference on Social Simulation, 2023.</p>
+                        <a href="https://www.google.com/search?q=International+Conference+on+Social+Simulation" target="_blank" class="read-more">Ver Publicación</a>
+                    </article>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.google.com/search?q=publicaciones+modelos+basados+en+agentes" target="_blank" class="btn btn-secondary">Ver Todas las Publicaciones</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="container">
+                <h2>Contacto</h2>
+                <p>¿Interesado en colaborar o aprender más sobre nuestro trabajo? No dudes en contactarnos.</p>
+                <div class="contact-info">
+                    <p><strong>Dirección:</strong> Av. Siempre Viva 742, Buenos Aires, Argentina</p>
+                    <p><strong>Teléfono:</strong> +54 11 1234 5678</p>
+                    <p><strong>Email:</strong> <a href="mailto:info@lsmba.org">info@lsmba.org</a></p>
+                </div>
+                <form class="contact-form">
+                    <input type="text" placeholder="Tu Nombre" required>
+                    <input type="email" placeholder="Tu Email" required>
+                    <textarea placeholder="Tu Mensaje" rows="5" required></textarea>
+                    <button type="submit" class="btn">Enviar Mensaje</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Laboratorio de Simulación de Modelos Basados en Agentes. Todos los derechos reservados.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com" target="_blank"><img src="https://via.placeholder.com/30x30/ffffff/000000?text=in" alt="LinkedIn"></a>
+                <a href="https://www.twitter.com" target="_blank"><img src="https://via.placeholder.com/30x30/ffffff/000000?text=X" alt="Twitter"></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth Scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
