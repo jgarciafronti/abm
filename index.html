@@ -61,7 +61,7 @@
         .hero {
             background: url('https://via.placeholder.com/1920x600/0056b3/ffffff?text=Laboratorio+de+Simulacion') no-repeat center center/cover;
             color: var(--white-color);
-            height: 60vh; /* Shorter hero */
+            height: 40vh; /* Reduced height for less space */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -82,18 +82,18 @@
 
         .hero-content {
             z-index: 1;
-            padding: 20px;
+            padding: 10px; /* Reduced padding */
         }
 
         .hero-content h1 {
-            font-size: 3.5em; /* Adjusted for simplicity */
-            margin-bottom: 10px;
+            font-size: 2.8em; /* Reduced font size */
+            margin-bottom: 5px; /* Reduced margin */
             color: var(--white-color);
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
         }
 
         .hero-content p {
-            font-size: 1.3em;
+            font-size: 1.1em; /* Reduced font size */
             color: var(--white-color);
             opacity: 0.9;
         }
@@ -187,7 +187,10 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .hero-content h1 {
-                font-size: 2.8em;
+                font-size: 2.2em; /* Further reduced for smaller screens */
+            }
+            .hero-content p {
+                font-size: 0.9em;
             }
             .navbar {
                 flex-direction: column;
@@ -210,7 +213,7 @@
 
         @media (max-width: 480px) {
             .hero-content h1 {
-                font-size: 2.2em;
+                font-size: 1.8em;
             }
             h2 {
                 font-size: 1.8em;
