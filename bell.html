@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Estados de Bell | Entrelazamiento Cuántico de dos Qubits</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
+            margin: 0;
+            padding: 24px 20px;
+            color: #1a2c3e;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e3c72, #2b4c7c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.3px;
+        }
+
+        .sub {
+            color: #2c5282;
+            border-left: 4px solid #3182ce;
+            padding-left: 16px;
+            margin-bottom: 32px;
+            font-weight: 400;
+            font-size: 1.1rem;
+        }
+
+        /* Tarjetas principales */
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.02);
+            padding: 1.5rem 1.8rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card-buttons {
+            flex: 1.2;
+            min-width: 260px;
+        }
+
+        .card-vis {
+            flex: 2.5;
+            min-width: 480px;
+        }
+
+        .card-correlacion {
+            flex: 1.5;
+            min-width: 260px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .card-vis, .card-buttons, .card-correlacion {
+                min-width: auto;
+            }
+        }
+
+        /* Botones estados Bell */
+        .bell-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin: 24px 0 20px;
+        }
+
+        .bell-btn {
+            background: #f0f4fa;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 6px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: #1e3a5f;
+            letter-spacing: 0.5px;
+        }
+
+        .bell-btn.active {
+            background: #1e3c72;
+            color: white;
+            box-shadow: 0 8px 18px rgba(30,60,114,0.3);
+            border: 1px solid #ffffff60;
+        }
+
+        .bell-btn:hover {
+            transform: translateY(-2px);
+            background: #d9e4f0;
+        }
+
+        .estado-actual {
+            background: #e9f0f9;
+            border-radius: 28px;
+            padding: 12px 18px;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .estado-math {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.35rem;
+            background: #ffffffc9;
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 48px;
+            font-weight: 500;
+        }
+
+        /* Canvas y gráficos */
+        .canvas-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: space-between;
+            margin: 20px 0 10px;
+        }
+
+        .chart-box {
+            flex: 1;
+            min-width: 220px;
+            background: #fefefe;
+            border-radius: 24px;
+            padding: 12px 8px 8px 8px;
+            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #2c5282;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            width: 100%;
+            height: auto;
+        }
+
+        .amplitudes-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            gap: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .basis-item {
+            text-align: center;
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 6px 4px;
+            flex: 1;
+        }
+
+        .prob-val {
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .correlation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            font-size: 0.9rem;
+        }
+
+        .correlation-table td, .correlation-table th {
+            padding: 10px 8px;
+            border-bottom: 1px solid #cbd5e0;
+            text-align: center;
+        }
+
+        .badge {
+            background: #1e3c72;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .demo-medicion {
+            background: #f8fafd;
+            border-radius: 28px;
+            margin-top: 32px;
+            padding: 20px 24px;
+            border: 1px solid #e2edf7;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .btn-demo {
+            background: #2c5282;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-demo:hover {
+            background: #1a3b5c;
+            transform: scale(0.97);
+        }
+
+        .resultado-medicion {
+            background: #eef2ff;
+            border-radius: 24px;
+            padding: 14px 20px;
+            font-family: monospace;
+            font-size: 1rem;
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            font-size: 0.8rem;
+            color: #4a6a8b;
+        }
+
+        hr {
+            margin: 12px 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, #cbd5e0, transparent);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔮 Estados de Bell · Dos Qubits Entrelazados</h1>
+    <div class="sub">Máxima correlación cuántica — Base de Bell y propiedades de medición</div>
+
+    <div class="dashboard">
+        <!-- Panel de selección -->
+        <div class="card card-buttons">
+            <h3 style="margin-top: 0;">⚛️ Selecciona un estado de Bell</h3>
+            <div class="bell-buttons" id="bellButtonsContainer">
+                <!-- botones dinámicos con JS, pero los genero desde script -->
+            </div>
+            <div class="estado-actual">
+                <span style="font-size: 0.85rem;">Estado actual:</span><br>
+                <span id="currentStateExpr" class="estado-math">|Φ⁺⟩ = (|00⟩+|11⟩)/√2</span>
+            </div>
+            <hr>
+            <div style="font-size: 0.85rem; line-height: 1.4;">
+                <p>📘 <strong>¿Qué son?</strong> Los cuatro estados de Bell son estados cuánticos <strong>maximamente entrelazados</strong> de dos qubits. No pueden escribirse como producto de estados individuales. Forman una base ortonormal.</p>
+                <p>✨ La medición en un qubit determina instantáneamente el estado del otro, sin importar la distancia.</p>
+            </div>
+        </div>
+
+        <!-- Panel visual: amplitudes y probabilidades -->
+        <div class="card card-vis">
+            <h3 style="margin-top: 0;">📊 Representación de amplitudes y probabilidades</h3>
+            <div class="canvas-container">
+                <div class="chart-box">
+                    <div class="chart-title">🎯 Amplitud real (α)</div>
+                    <canvas id="ampCanvas" width="400" height="180" style="width:100%; height:auto; max-width:400px; aspect-ratio:400/180"></canvas>
+                    <div class="amplitudes-grid" id="amplitudesText"></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">📈 Probabilidad |α|²</div>
+                    <canvas id="probCanvas" width="400" height="150" style="width:100%; height:auto; max-width:400px; aspect-ratio:400/150"></canvas>
+                    <div class="amplitudes-grid" id="probabilitiesText"></div>
+                </div>
+            </div>
+            <div style="font-size: 0.8rem; background:#ecf3fa; border-radius: 20px; padding: 8px 12px; margin-top: 8px;">
+                💡 Las amplitudes pueden ser negativas (representadas en rojo). Aunque la probabilidad es siempre positiva, la fase relativa es clave en interferencia cuántica.
+            </div>
+        </div>
+
+        <!-- Panel correlación y propiedades -->
+        <div class="card card-correlacion">
+            <h3 style="margin-top: 0;">🔗 Correlación & entrelazamiento</h3>
+            <div id="correlationInfo">
+                <!-- se llena dinámicamente -->
+                <table class="correlation-table">
+                    <tr><th>Medición Qubit A</th><th>Qubit B colapsa a</th></tr>
+                    <tr><td>0 (50%)</td><td>|0⟩</td></tr>
+                    <tr><td>1 (50%)</td><td>|1⟩</td></tr>
+                </table>
+                <div style="margin-top: 12px;"><span class="badge">entrelazamiento máximo</span> <span class="badge" style="background:#2b6a9f;">no separable</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demostración interactiva: medición y colapso -->
+    <div class="demo-medicion">
+        <h3 style="margin:0 0 6px 0">🧪 Simulación de medición (correlación en acción)</h3>
+        <p style="margin-bottom: 8px; font-size: 0.9rem;">Selecciona un qubit para medir. Según el estado de Bell actual, el otro qubit colapsará a un estado definido. La aleatoriedad respeta las probabilidades cuánticas.</p>
+        <div class="demo-buttons">
+            <button id="measureQ0Btn" class="btn-demo">📐 Medir Qubit 0</button>
+            <button id="measureQ1Btn" class="btn-demo">📐 Medir Qubit 1</button>
+            <button id="resetDemoBtn" class="btn-demo" style="background:#4a627a;">⟳ Limpiar resultado</button>
+        </div>
+        <div id="measurementResult" class="resultado-medicion">
+            ⚡ Haz clic en "Medir" para observar el colapso por entrelazamiento.
+        </div>
+        <div style="font-size: 0.75rem; margin-top: 10px;">
+            * La simulación no altera el estado de Bell mostrado arriba; solo muestra un posible resultado de medición y la correlación instantánea.
+        </div>
+    </div>
+    <footer>
+        Los estados de Bell | |Φ⁺⟩, |Φ⁻⟩, |Ψ⁺⟩, |Ψ⁻⟩ — Base fundamental para teleportación, codificación superdensa y criptografía cuántica.
+    </footer>
+</div>
+
+<script>
+    // ---------- Definición de los 4 estados de Bell (amplitudes reales) ----------
+    const BELL_STATES = [
+        {
+            name: "|Φ⁺⟩",
+            expr: "|Φ⁺⟩ = (|00⟩ + |11⟩) / √2",
+            amplitudes: [1/Math.sqrt(2), 0, 0, 1/Math.sqrt(2)],   // orden: |00>, |01>, |10>, |11>
+            correlation: "Correlación perfecta: Si Qubit0 = 0 ⇒ Qubit1 = 0 ; Qubit0 = 1 ⇒ Qubit1 = 1",
+            measureMap: { q0_outcome0: "|0⟩", q0_outcome1: "|1⟩", q1_outcome0: "|0⟩", q1_outcome1: "|1⟩" }
+        },
+        {
+            name: "|Φ⁻⟩",
+            expr: "|Φ⁻⟩ = (|00⟩ − |11⟩) / √2",
+            amplitudes: [1/Math.sqrt(2), 0, 0, -1/Math.sqrt(2)],
+            correlation: "Correlación perfecta (con fase negativa): Qubit0 = 0 ⇒ Qubit1 = 0 ; 1 ⇒ 1",
+            measureMap: { q0_outcome0: "|0⟩", q0_outcome1: "|1⟩", q1_outcome0: "|0⟩", q1_outcome1: "|1⟩" }
+        },
+        {
+            name: "|Ψ⁺⟩",
+            expr: "|Ψ⁺⟩ = (|01⟩ + |10⟩) / √2",
+            amplitudes: [0, 1/Math.sqrt(2), 1/Math.sqrt(2), 0],
+            correlation: "Anti-correlación: Qubit0 = 0 ⇒ Qubit1 = 1 ; Qubit0 = 1 ⇒ Qubit1 = 0",
+            measureMap: { q0_outcome0: "|1⟩", q0_outcome1: "|0⟩", q1_outcome0: "|1⟩", q1_outcome1: "|0⟩" }
+        },
+        {
+            name: "|Ψ⁻⟩",
+            expr: "|Ψ⁻⟩ = (|01⟩ − |10⟩) / √2",
+            amplitudes: [0, 1/Math.sqrt(2), -1/Math.sqrt(2), 0],
+            correlation: "Anti-correlación con fase negativa: Qubit0 = 0 ⇒ Qubit1 = 1 ; 1 ⇒ 0",
+            measureMap: { q0_outcome0: "|1⟩", q0_outcome1: "|0⟩", q1_outcome0: "|1⟩", q1_outcome1: "|0⟩" }
+        }
+    ];
+
+    // índices bases
+    const BASIS_LABELS = ["|00⟩", "|01⟩", "|10⟩", "|11⟩"];
+    let currentStateIdx = 0;      // 0: Φ+
+
+    // elementos DOM
+    const ampCanvas = document.getElementById('ampCanvas');
+    const probCanvas = document.getElementById('probCanvas');
+    const currentStateExprSpan = document.getElementById('currentStateExpr');
+    const amplitudesTextDiv = document.getElementById('amplitudesText');
+    const probabilitiesTextDiv = document.getElementById('probabilitiesText');
+    const correlationInfoDiv = document.getElementById('correlationInfo');
+    const measureQ0Btn = document.getElementById('measureQ0Btn');
+    const measureQ1Btn = document.getElementById('measureQ1Btn');
+    const resetDemoBtn = document.getElementById('resetDemoBtn');
+    const measurementResultDiv = document.getElementById('measurementResult');
+
+    // ---------- Funciones de dibujo ----------
+    function drawAmplitudes(amps) {
+        const ctx = ampCanvas.getContext('2d');
+        const w = ampCanvas.width, h = ampCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+        // Configuración
+        const barWidth = (w - 80) / 4;  // 4 barras, márgenes
+        const startX = 35;
+        const baselineY = h * 0.7; // línea base ~ 0
+        const maxAmp = 0.71;   // 1/√2 ≈ 0.7071, margen visual
+        const scaleY = 80;      // píxeles por unidad de amplitud (positiva/negativa)
+
+        for (let i = 0; i < amps.length; i++) {
+            const amp = amps[i];
+            const x = startX + i * (barWidth + 12);
+            const height = Math.abs(amp) * scaleY;
+            const isPositive = amp >= 0;
+            let yRect;
+            if (isPositive) {
+                yRect = baselineY - height;
+                ctx.fillStyle = "#2b6a9f";
+            } else {
+                yRect = baselineY;
+                ctx.fillStyle = "#c44536";
+            }
+            ctx.fillRect(x, yRect, barWidth - 6, height);
+            // borde
+            ctx.strokeStyle = "#1e3a5f";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, yRect, barWidth - 6, height);
+            // etiqueta base
+            ctx.fillStyle = "#1e2f44";
+            ctx.font = "bold 12px 'Segoe UI'";
+            ctx.fillText(BASIS_LABELS[i], x + 5, baselineY + 18);
+            // mostrar valor numérico
+            ctx.fillStyle = "#0f2b3f";
+            ctx.font = "11px monospace";
+            ctx.fillText(amp.toFixed(3), x + 5, isPositive ? yRect - 3 : yRect + 15);
+        }
+        // línea cero
+        ctx.beginPath();
+        ctx.moveTo(20, baselineY);
+        ctx.lineTo(w-20, baselineY);
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = "#475569";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("0", 12, baselineY+3);
+    }
+
+    function drawProbabilities(amps) {
+        const ctx = probCanvas.getContext('2d');
+        const w = probCanvas.width, h = probCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+        const probs = amps.map(a => a * a);
+        const maxProb = 0.5; // todas las probabilidades son 0 o 0.5
+        const barWidth = (w - 80) / 4;
+        const startX = 35;
+        const baselineY = h - 25;
+        const maxHeight = 90;
+
+        for (let i = 0; i < probs.length; i++) {
+            const prob = probs[i];
+            const height = (prob / maxProb) * maxHeight;
+            const x = startX + i * (barWidth + 12);
+            const yRect = baselineY - height;
+            ctx.fillStyle = "#38a169";
+            ctx.fillRect(x, yRect, barWidth - 6, height);
+            ctx.strokeStyle = "#276749";
+            ctx.strokeRect(x, yRect, barWidth - 6, height);
+            ctx.fillStyle = "#1a3c34";
+            ctx.font = "bold 12px 'Segoe UI'";
+            ctx.fillText(BASIS_LABELS[i], x + 5, baselineY + 15);
+            ctx.fillStyle = "#115e3e";
+            ctx.font = "11px monospace";
+            ctx.fillText(prob.toFixed(3), x + 5, yRect - 4);
+        }
+        ctx.fillStyle = "#475569";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("Probabilidad", w-70, baselineY-5);
+    }
+
+    function updateAmplitudesText(amps) {
+        let html = '';
+        for (let i=0; i<BASIS_LABELS.length; i++) {
+            let val = amps[i].toFixed(4);
+            let sign = amps[i]>=0 ? '+' : '';
+            html += `<div class="basis-item"><strong>${BASIS_LABELS[i]}</strong><br>α = ${sign}${val}</div>`;
+        }
+        amplitudesTextDiv.innerHTML = html;
+    }
+
+    function updateProbabilitiesText(amps) {
+        let probs = amps.map(a => (a*a).toFixed(4));
+        let html = '';
+        for (let i=0; i<BASIS_LABELS.length; i++) {
+            html += `<div class="basis-item"><strong>${BASIS_LABELS[i]}</strong><br>P = ${probs[i]}</div>`;
+        }
+        probabilitiesTextDiv.innerHTML = html;
+    }
+
+    function updateCorrelationPanel(state) {
+        // generar tabla explicativa de correlación y resumen
+        let measureMap = state.measureMap;
+        let htmlTable = `
+            <table class="correlation-table">
+                <tr><th>Medición Qubit 0</th><th>Estado Qubit 1</th></tr>
+                <tr><td>0 (50%)</td><td>${measureMap.q0_outcome0}</td></tr>
+                <tr><td>1 (50%)</td><td>${measureMap.q0_outcome1}</td></tr>
+                <tr><th colspan="2">Medición Qubit 1</th></tr>
+                <tr><td>0 (50%)</td><td>${measureMap.q1_outcome0}</td></tr>
+                <tr><td>1 (50%)</td><td>${measureMap.q1_outcome1}</td></tr>
+            </table>
+            <div style="margin-top: 14px;">
+                <span class="badge">🔗 entrelazado máximo</span>
+                <span class="badge" style="background:#2b6a9f;">⨂ no factorizable</span>
+            </div>
+            <p style="font-size:0.8rem; margin-top:12px;">${state.correlation}</p>
+        `;
+        correlationInfoDiv.innerHTML = htmlTable;
+    }
+
+    // actualizar toda la UI según el estado actual
+    function refreshUI() {
+        const state = BELL_STATES[currentStateIdx];
+        const amps = state.amplitudes;
+        // actualizar expresión y nombre
+        currentStateExprSpan.innerHTML = `${state.name} = ${state.expr.split('=')[1] || state.expr}`;
+        // dibujar gráficas
+        drawAmplitudes(amps);
+        drawProbabilities(amps);
+        updateAmplitudesText(amps);
+        updateProbabilitiesText(amps);
+        updateCorrelationPanel(state);
+        // resaltar botón activo
+        document.querySelectorAll('.bell-btn').forEach((btn, idx) => {
+            if (idx === currentStateIdx) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        // limpiar mensaje de medición demo para evitar confusiones
+        measurementResultDiv.innerHTML = "⚡ Haz clic en \"Medir\" para observar el colapso por entrelazamiento.";
+    }
+
+    // ---------- Simulación de medición (sin modificar estado global) ----------
+    function measureQubit(qubitIndex) {
+        const state = BELL_STATES[currentStateIdx];
+        const amps = state.amplitudes; // [00,01,10,11]
+        // Calcular probabilidad de medir |0> en el qubit elegido
+        let prob0 = 0;
+        if (qubitIndex === 0) { // qubit 0: bases |00> y |01>
+            prob0 = (amps[0]*amps[0]) + (amps[1]*amps[1]);
+        } else { // qubit 1: bases |00> y |10>
+            prob0 = (amps[0]*amps[0]) + (amps[2]*amps[2]);
+        }
+        const rand = Math.random();
+        const outcome = (rand < prob0) ? 0 : 1;
+        // Determinar colapso del otro qubit y la base resultante
+        let otherQubitState = "";
+        let collapsedBasis = "";
+        if (qubitIndex === 0) {
+            if (outcome === 0) {
+                // colapsa a combinación de |00> y |01> pero en Bell states puros da estado definido
+                // extraemos del measureMap
+                if (outcome === 0) otherQubitState = state.measureMap.q0_outcome0;
+                else otherQubitState = state.measureMap.q0_outcome1;
+                // mostrar base exacta colapsada
+                if (outcome === 0) {
+                    collapsedBasis = (Math.abs(amps[0]) > 0) ? "|00⟩" : "|01⟩";
+                    if (amps[0] === 0 && amps[1] !== 0) collapsedBasis = "|01⟩";
+                    else if (amps[0] !== 0) collapsedBasis = "|00⟩";
+                } else {
+                    collapsedBasis = (Math.abs(amps[2]) > 0) ? "|10⟩" : "|11⟩";
+                    if (amps[2] !== 0) collapsedBasis = "|10⟩";
+                    else collapsedBasis = "|11⟩";
+                }
+            } else {
+                otherQubitState = state.measureMap.q0_outcome1;
+                if (outcome === 1) {
+                    collapsedBasis = (Math.abs(amps[2]) > 0) ? "|10⟩" : "|11⟩";
+                    if (amps[2] !== 0) collapsedBasis = "|10⟩";
+                    else collapsedBasis = "|11⟩";
+                } else {
+                    collapsedBasis = (Math.abs(amps[0]) > 0) ? "|00⟩" : "|01⟩";
+                }
+            }
+        } else { // medimos qubit 1
+            if (outcome === 0) otherQubitState = state.measureMap.q1_outcome0;
+            else otherQubitState = state.measureMap.q1_outcome1;
+            if (outcome === 0) {
+                collapsedBasis = (Math.abs(amps[0]) > 0) ? "|00⟩" : "|10⟩";
+                if (amps[0] !== 0) collapsedBasis = "|00⟩";
+                else collapsedBasis = "|10⟩";
+            } else {
+                collapsedBasis = (Math.abs(amps[1]) > 0) ? "|01⟩" : "|11⟩";
+                if (amps[1] !== 0) collapsedBasis = "|01⟩";
+                else collapsedBasis = "|11⟩";
+            }
+        }
+
+        // Mensaje descriptivo
+        let qubitName = qubitIndex === 0 ? "Qubit 0" : "Qubit 1";
+        let otherName = qubitIndex === 0 ? "Qubit 1" : "Qubit 0";
+        let resultadoHTML = `
+            <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;">
+                <span>🎲 <strong>${qubitName}</strong> medido = <strong style="background:#1e3c72; padding:2px 12px; border-radius:40px; color:white;">${outcome}</strong></span>
+                <span>🔮 <strong>${otherName}</strong> colapsa a: ${otherQubitState}</span>
+                <span>📌 Estado colapsado total: ${collapsedBasis}</span>
+            </div>
+            <div style="margin-top:10px; font-size:0.85rem;">✨ El resultado es aleatorio pero la correlación es perfecta: el otro qubit queda determinado instantáneamente.</div>
+        `;
+        measurementResultDiv.innerHTML = resultadoHTML;
+    }
+
+    function resetDemoMessage() {
+        measurementResultDiv.innerHTML = "⚡ Haz clic en \"Medir\" para observar el colapso por entrelazamiento.";
+    }
+
+    // ----- Crear botones de estados Bell -----
+    function createBellButtons() {
+        const container = document.getElementById('bellButtonsContainer');
+        container.innerHTML = '';
+        BELL_STATES.forEach((state, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'bell-btn';
+            btn.innerHTML = state.name;
+            btn.addEventListener('click', () => {
+                currentStateIdx = idx;
+                refreshUI();
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    // ----- Inicializar eventos y estado por defecto-----
+    function init() {
+        createBellButtons();
+        refreshUI();
+        measureQ0Btn.addEventListener('click', () => measureQubit(0));
+        measureQ1Btn.addEventListener('click', () => measureQubit(1));
+        resetDemoBtn.addEventListener('click', resetDemoMessage);
+        // ajuste de canvas responsivo (redibujar al resize, aunque no es necesario pero garantiza)
+        window.addEventListener('resize', () => {
+            const amps = BELL_STATES[currentStateIdx].amplitudes;
+            drawAmplitudes(amps);
+            drawProbabilities(amps);
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
