@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📘 Cirq en Google Colab · Guía interactiva</title>
+  <!-- Fuentes y estilos base -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0b1e33;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 20px 40px -10px rgba(0,20,50,0.12);
+      overflow: hidden;
+      padding: 2rem 2.5rem;
+      transition: all 0.2s;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.5rem; }
+      .container { padding: 1.5rem 1.2rem; }
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 0.5rem;
+      color: #0a2540;
+    }
+
+    h1 i {
+      color: #3b82f6;
+      font-size: 2.2rem;
+    }
+
+    .subhead {
+      font-size: 1.2rem;
+      color: #475569;
+      margin-bottom: 2rem;
+      border-left: 4px solid #3b82f6;
+      padding-left: 1.2rem;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 1.8rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 i {
+      color: #2563eb;
+      font-size: 1.6rem;
+    }
+
+    h3 {
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin: 1.5rem 0 0.8rem;
+      color: #334155;
+    }
+
+    p {
+      margin-bottom: 1.2rem;
+      color: #1e293b;
+    }
+
+    .card {
+      background: #f1f5f9;
+      border-radius: 20px;
+      padding: 1.5rem 1.8rem;
+      margin: 1.5rem 0;
+      border: 1px solid #e2e8f0;
+    }
+
+    .highlight {
+      background: #e6f0ff;
+      border-left: 5px solid #2563eb;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .code-block {
+      position: relative;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 1.2rem 1.5rem;
+      border-radius: 18px;
+      margin: 1.5rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: inset 0 0 0 1px #334155;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      padding: 0.5rem 1.5rem;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      margin-bottom: -5px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .code-header + .code-block {
+      margin-top: 0;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .copy-btn {
+      background: #334155;
+      border: none;
+      color: #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      border: 1px solid #475569;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .copy-btn:hover {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .copy-btn i {
+      font-size: 0.9rem;
+    }
+
+    .interactive-tip {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      border-radius: 20px;
+      padding: 1.2rem 1.8rem;
+      margin: 2rem 0;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .interactive-tip i {
+      font-size: 2rem;
+      color: #ea580c;
+    }
+
+    .badge-colab {
+      background: #f59e0b;
+      color: #0f172a;
+      font-weight: 600;
+      padding: 2px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+    .step-list {
+      list-style: none;
+    }
+
+    .step-list li {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      background: #2563eb;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .table-gates {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 1.2rem 0;
+    }
+
+    .gate-item {
+      background: white;
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      border: 1px solid #e2e8f0;
+      font-weight: 500;
+    }
+
+    .gate-item code {
+      background: #eef2ff;
+      padding: 3px 8px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      color: #1e40af;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 2rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .btn-colab {
+      background: #1a1a2e;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #2d2d44;
+      transition: 0.2s;
+    }
+
+    .btn-colab:hover {
+      background: #16213e;
+      transform: translateY(-2px);
+    }
+
+    /* tooltip copy feedback */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>
+    <i class="fas fa-atom"></i> 
+    Cirq en Google Colaboratory
+    <span class="badge-colab"><i class="fab fa-google"></i> Colab</span>
+  </h1>
+  <div class="subhead">
+    Una guía interactiva para simular circuitos cuánticos con Python
+  </div>
+
+  <!-- INTRO -->
+  <p style="font-size:1.1rem"><strong>Cirq</strong> es una biblioteca de Python de código abierto desarrollada por Google Quantum AI para escribir, manipular y simular circuitos cuánticos. Esta página te muestra cómo usarla dentro del entorno gratuito de <i class="fab fa-google"></i> <strong>Google Colaboratory</strong>.</p>
+
+  <div class="interactive-tip">
+    <i class="fas fa-lightbulb"></i>
+    <div><strong>¿Qué hace esta página interactiva?</strong><br>Puedes copiar cada bloque de código con un clic y pegarlo directamente en una celda de Colab. Además, las explicaciones son dinámicas: al hacer clic en algunos conceptos se despliegan detalles.</div>
+  </div>
+
+  <!-- SECCIÓN 1: INSTALACIÓN -->
+  <h2><i class="fas fa-download"></i> 1. Instalación en Colab</h2>
+  <p>Google Colab ya incluye muchas librerías, pero Cirq normalmente se instala con <code>pip</code>. Ejecuta este comando en una celda:</p>
+
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Celda de instalación</span>
+    <button class="copy-btn" data-code="!pip install cirq"><i class="far fa-copy"></i> Copiar</button>
+  </div>
+  <div class="code-block">!pip install cirq</div>
+
+  <p>Tras la instalación, verifica con:</p>
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Verificar versión</span>
+    <button class="copy-btn" data-code="import cirq\nprint(cirq.__version__)"><i class="far fa-copy"></i> Copiar</button>
+  </div>
+  <div class="code-block">import cirq
+print(cirq.__version__)</div>
+
+  <!-- SECCIÓN 2: CONCEPTOS BÁSICOS INTERACTIVOS -->
+  <h2><i class="fas fa-cubes"></i> 2. Conceptos fundamentales</h2>
+  <p>Antes de programar, familiarízate con estos bloques:</p>
+  
+  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    <div style="flex:1; min-width: 180px; background: #f8fafc; border-radius: 20px; padding: 1.2rem; border:1px solid #dee6ed;">
+      <i class="fas fa-circle" style="color:#2563eb;"></i> <strong>Qubit</strong><br>
+      <small>Unidad básica. En Cirq se crea con <code>cirq.NamedQubit</code> o <code>cirq.GridQubit</code>.</small>
+    </div>
+    <div style="flex:1; min-width: 180px; background: #f8fafc; border-radius: 20px; padding: 1.2rem; border:1px solid #dee6ed;">
+      <i class="fas fa-grip-lines"></i> <strong>Momento</strong><br>
+      <small>Conjunto de operaciones que actúan al mismo tiempo.</small>
+    </div>
+    <div style="flex:1; min-width: 180px; background: #f8fafc; border-radius: 20px; padding: 1.2rem; border:1px solid #dee6ed;">
+      <i class="fas fa-project-diagram"></i> <strong>Circuito</strong><br>
+      <small>Secuencia de momentos que representan el algoritmo cuántico.</small>
+    </div>
+    <div style="flex:1; min-width: 180px; background: #f8fafc; border-radius: 20px; padding: 1.2rem; border:1px solid #dee6ed;">
+      <i class="fas fa-microchip"></i> <strong>Simulador</strong><br>
+      <small><code>cirq.Simulator()</code> ejecuta el circuito y obtiene resultados.</small>
+    </div>
+  </div>
+
+  <!-- PUERTAS COMUNES -->
+  <h3><i class="fas fa-shapes"></i> Puertas cuánticas más usadas</h3>
+  <div class="table-gates">
+    <div class="gate-item"><code>cirq.X</code> &nbsp; Pauli-X (NOT)</div>
+    <div class="gate-item"><code>cirq.Y</code> &nbsp; Pauli-Y</div>
+    <div class="gate-item"><code>cirq.Z</code> &nbsp; Pauli-Z</div>
+    <div class="gate-item"><code>cirq.H</code> &nbsp; Hadamard</div>
+    <div class="gate-item"><code>cirq.CNOT</code> &nbsp; Control-NOT</div>
+    <div class="gate-item"><code>cirq.S</code> / <code>T</code> &nbsp; Fase</div>
+    <div class="gate-item"><code>cirq.measure</code> &nbsp; Medición</div>
+    <div class="gate-item"><code>cirq.rx</code>, <code>ry</code>, <code>rz</code></div>
+  </div>
+
+  <!-- EJEMPLO 1: X gate -->
+  <h2><i class="fas fa-play-circle"></i> 3. Primer circuito: qubit con puerta X</h2>
+  <p>Vamos a crear un qubit, aplicarle una puerta X (que invierte el estado |0⟩ a |1⟩) y medir.</p>
+
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Ejemplo 1 – X gate y medición</span>
+    <button class="copy-btn" data-code="import cirq\n\n# Crear un qubit\nq = cirq.NamedQubit('q')\n\n# Construir circuito\ncircuito = cirq.Circuit(\n    cirq.X(q),       # Puerta X\n    cirq.measure(q, key='resultado')\n)\n\nprint('Circuito:')\nprint(circuito)\n\n# Simular\nsim = cirq.Simulator()\nresultado = sim.run(circuito, repetitions=10)\nprint('\\nResultados de 10 ejecuciones:')\nprint(resultado.histogram(key='resultado'))"><i class="far fa-copy"></i> Copiar todo</button>
+  </div>
+  <div class="code-block">import cirq
+
+# Crear un qubit
+q = cirq.NamedQubit('q')
+
+# Construir circuito
+circuito = cirq.Circuit(
+    cirq.X(q),       # Puerta X
+    cirq.measure(q, key='resultado')
+)
+
+print('Circuito:')
+print(circuito)
+
+# Simular
+sim = cirq.Simulator()
+resultado = sim.run(circuito, repetitions=10)
+print('\nResultados de 10 ejecuciones:')
+print(resultado.histogram(key='resultado'))</div>
+  <p><i class="fas fa-info-circle"></i> Verás que siempre sale <code>1</code> porque la puerta X cambió el estado inicial.</p>
+
+  <!-- EJEMPLO 2: BELL STATE -->
+  <h2><i class="fas fa-link"></i> 4. Estado de Bell (entrelazamiento)</h2>
+  <p>El clásico: Hadamard en el primer qubit y luego CNOT para entrelazar.</p>
+
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Bell state |Φ⁺⟩</span>
+    <button class="copy-btn" data-code="import cirq\n\n# Dos qubits\nq0, q1 = cirq.LineQubit.range(2)\n\ncircuito_bell = cirq.Circuit(\n    cirq.H(q0),\n    cirq.CNOT(q0, q1),\n    cirq.measure(q0, q1, key='bell')\n)\n\nprint(circuito_bell)\n\nsim = cirq.Simulator()\nresultados = sim.run(circuito_bell, repetitions=1000)\nconteo = resultados.histogram(key='bell')\nprint('\\nConteo de 1000 ejecuciones (00,01,10,11):')\nfor bits, cuenta in sorted(conteo.items()):\n    print(f'{bits:02b} : {cuenta}')"><i class="far fa-copy"></i> Copiar</button>
+  </div>
+  <div class="code-block">import cirq
+
+# Dos qubits
+q0, q1 = cirq.LineQubit.range(2)
+
+circuito_bell = cirq.Circuit(
+    cirq.H(q0),
+    cirq.CNOT(q0, q1),
+    cirq.measure(q0, q1, key='bell')
+)
+
+print(circuito_bell)
+
+sim = cirq.Simulator()
+resultados = sim.run(circuito_bell, repetitions=1000)
+conteo = resultados.histogram(key='bell')
+print('\nConteo de 1000 ejecuciones (00,01,10,11):')
+for bits, cuenta in sorted(conteo.items()):
+    print(f'{bits:02b} : {cuenta}')</div>
+  <p>Observarás aproximadamente 50% <code>00</code> y 50% <code>11</code>, sin estados intermedios.</p>
+
+  <!-- EJEMPLO 3: PARÁMETROS Y SIMULACIÓN AVANZADA -->
+  <h2><i class="fas fa-sliders-h"></i> 5. Circuitos parametrizados</h2>
+  <p>Cirq permite usar símbolos para construir circuitos que luego se evalúan con valores concretos.</p>
+
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Puerta Rx con parámetro</span>
+    <button class="copy-btn" data-code="import cirq\nimport sympy\n\nq = cirq.GridQubit(0, 0)\ntheta = sympy.Symbol('theta')\n\ncirc_param = cirq.Circuit(cirq.rx(theta)(q))\nprint('Circuito parametrizado:')\nprint(circ_param)\n\n# Resolver para theta = π\nresolver = cirq.ParamResolver({'theta': 3.1416})\ncirc_resuelto = cirq.resolve_parameters(circ_param, resolver)\nprint('\\nCircuito con theta = π:')\nprint(circ_resuelto)"><i class="far fa-copy"></i> Copiar</button>
+  </div>
+  <div class="code-block">import cirq
+import sympy
+
+q = cirq.GridQubit(0, 0)
+theta = sympy.Symbol('theta')
+
+circ_param = cirq.Circuit(cirq.rx(theta)(q))
+print('Circuito parametrizado:')
+print(circ_param)
+
+# Resolver para theta = π
+resolver = cirq.ParamResolver({'theta': 3.1416})
+circ_resuelto = cirq.resolve_parameters(circ_param, resolver)
+print('\nCircuito con theta = π:')
+print(circ_resuelto)</div>
+
+  <!-- SIMULADOR CON VECTOR DE ESTADO -->
+  <h3>Simulación de vector de estado</h3>
+  <p>Para inspeccionar el estado cuántico completo:</p>
+  <div class="code-header">
+    <span><i class="fab fa-python"></i> Obtener vector de estado</span>
+    <button class="copy-btn" data-code="import cirq\n\nq0, q1 = cirq.LineQubit.range(2)\ncirc = cirq.Circuit(cirq.H(q0), cirq.CNOT(q0, q1))\n\nsim = cirq.Simulator()\nresult = sim.simulate(circ)\nprint('Vector de estado final:')\nprint(result.final_state_vector)"><i class="far fa-copy"></i> Copiar</button>
+  </div>
+  <div class="code-block">import cirq
+
+q0, q1 = cirq.LineQubit.range(2)
+circ = cirq.Circuit(cirq.H(q0), cirq.CNOT(q0, q1))
+
+sim = cirq.Simulator()
+result = sim.simulate(circ)
+print('Vector de estado final:')
+print(result.final_state_vector)</div>
+
+  <!-- SECCIÓN CONSEJOS COLAB -->
+  <div class="card">
+    <h3 style="margin-top:0"><i class="fas fa-cloud-upload-alt"></i> Trucos para Google Colab</h3>
+    <ul class="step-list">
+      <li><span class="step-num">1</span> Usa <code>!pip install cirq --quiet</code> para reducir mensajes.</li>
+      <li><span class="step-num">2</span> Para visualizar circuitos más bonitos, activa: <code>%matplotlib inline</code> y luego <code>print(circuito)</code>.</li>
+      <li><span class="step-num">3</span> Colab ofrece GPU/TPU, pero Cirq simula en CPU. Para simulación ruidosa usa <code>cirq.DensityMatrixSimulator</code>.</li>
+      <li><span class="step-num">4</span> Si quieres diagramas interactivos, instala también <code>cirq-web</code> (opcional).</li>
+    </ul>
+  </div>
+
+  <!-- BOTÓN A COLAB (ABRE NUEVO NOTEBOOK) -->
+  <div style="text-align: center; margin: 2.5rem 0;">
+    <a href="https://colab.research.google.com/#create=true&language=python" target="_blank" class="btn-colab">
+      <i class="fab fa-google"></i> Abrir Google Colab y probar Cirq ahora
+      <i class="fas fa-external-link-alt" style="font-size:0.8rem;"></i>
+    </a>
+    <p style="margin-top:10px; color:#64748b;"><small>Se abrirá un notebook en blanco. Pega los ejemplos de arriba.</small></p>
+  </div>
+
+  <!-- EXPLICACIÓN ADICIONAL CON DETALLES EXPANDIBLES (INTERACTIVIDAD) -->
+  <h2><i class="fas fa-question-circle"></i> Preguntas frecuentes (click para expandir)</h2>
+  <details style="margin-bottom: 1rem; background: #f9f9fc; padding: 1rem 1.5rem; border-radius: 20px;">
+    <summary style="font-weight:600; cursor:pointer; list-style: '▶ ';">¿Qué diferencia hay entre <code>run</code> y <code>simulate</code>?</summary>
+    <div style="margin-top:1rem; padding-left:1.5rem; border-left:2px solid #94a3b8;">
+      <code>run</code> ejecuta el circuito con mediciones y devuelve resultados clásicos (bits). <code>simulate</code> simula el estado cuántico completo (vector de estado) sin colapsar, ideal para depurar.
+    </div>
+  </details>
+  <details style="margin-bottom: 1rem; background: #f9f9fc; padding: 1rem 1.5rem; border-radius: 20px;">
+    <summary style="font-weight:600; cursor:pointer; list-style: '▶ ';">¿Puedo usar hardware cuántico real desde Colab?</summary>
+    <div style="margin-top:1rem; padding-left:1.5rem; border-left:2px solid #94a3b8;">
+      Sí, mediante <strong>Quantum Engine</strong> de Google. Necesitas una cuenta y un proyecto en Google Cloud. Desde Colab puedes autenticarte y enviar trabajos a procesadores como Sycamore.
+    </div>
+  </details>
+  <details style="margin-bottom: 1rem; background: #f9f9fc; padding: 1rem 1.5rem; border-radius: 20px;">
+    <summary style="font-weight:600; cursor:pointer; list-style: '▶ ';">¿Cirq funciona con otras librerías como Qiskit?</summary>
+    <div style="margin-top:1rem; padding-left:1.5rem; border-left:2px solid #94a3b8;">
+      No directamente, pero existen herramientas de conversión. Por ejemplo, <code>qiskit</code> y <code>cirq</code> tienen representaciones diferentes. Puedes usar <code>cirq.contrib</code> para interoperar.
+    </div>
+  </details>
+
+  <!-- RECURSOS -->
+  <h2><i class="fas fa-book-open"></i> Recursos recomendados</h2>
+  <ul style="margin-bottom: 2rem; columns: 2; column-gap: 2rem;">
+    <li style="margin-bottom:8px;"><a href="https://quantumai.google/cirq" target="_blank">Documentación oficial de Cirq</a></li>
+    <li style="margin-bottom:8px;"><a href="https://colab.research.google.com/github/quantumlib/Cirq/blob/master/docs/tutorials/basics.ipynb" target="_blank">Tutorial básico en Colab (oficial)</a></li>
+    <li style="margin-bottom:8px;"><a href="https://quantumai.google/cirq/tutorials" target="_blank">Lista de tutoriales interactivos</a></li>
+    <li style="margin-bottom:8px;"><a href="https://github.com/quantumlib/Cirq" target="_blank">Repositorio GitHub</a></li>
+  </ul>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <i class="fas fa-code-branch"></i> Página interactiva · Cirq + Google Colab · 
+    <i class="far fa-copy" style="margin-left: 8px;"></i> Copia el código y experimenta.
+  </div>
+</div>
+
+<!-- TOAST para copiado -->
+<div id="copyToast" class="toast-msg">📋 ¡Código copiado!</div>
+
+<script>
+  (function() {
+    const toast = document.getElementById('copyToast');
+    
+    function showToast(message) {
+      toast.textContent = message || '📋 ¡Código copiado!';
+      toast.style.opacity = '1';
+      setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    }
+
+    // Función para copiar texto al portapapeles
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('✅ Código copiado al portapapeles');
+      } catch (err) {
+        // fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('📋 Copiado (fallback)');
+      }
+    }
+
+    // Asignar eventos a todos los botones con data-code
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    copyButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const code = btn.getAttribute('data-code');
+        if (code) {
+          copyText(code);
+        } else {
+          // Si no tiene data-code, intenta obtener el texto del siguiente bloque .code-block
+          const parent = btn.closest('.code-header');
+          if (parent) {
+            const nextBlock = parent.nextElementSibling;
+            if (nextBlock && nextBlock.classList.contains('code-block')) {
+              copyText(nextBlock.innerText);
+            }
+          }
+        }
+      });
+    });
+
+    // Opcional: Hacer que los detalles <summary> tengan mejor estilo
+    const details = document.querySelectorAll('details');
+    details.forEach(d => {
+      d.addEventListener('toggle', () => {
+        const summary = d.querySelector('summary');
+        if (d.open) {
+          summary.style.listStyleType = "'▼ '";
+        } else {
+          summary.style.listStyleType = "'▶ '";
+        }
+      });
+    });
+    // inicializar estilo
+    document.querySelectorAll('details summary').forEach(s => {
+      s.style.listStyleType = "'▶ '";
+    });
+  })();
+</script>
+
+<!-- Pequeño estilo adicional para mejorar legibilidad -->
+<style>
+  code {
+    background: #e9eef4;
+    padding: 3px 8px;
+    border-radius: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    color: #0b3b5c;
+  }
+  .code-block code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+  }
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .fa-ul {
+    margin-left: 1.5em;
+  }
+  summary {
+    user-select: none;
+  }
+  details[open] summary {
+    margin-bottom: 0.5rem;
+  }
+</style>
+</body>
+</html>
